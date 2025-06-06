@@ -5,15 +5,15 @@ import (
 	wapi "github.com/codehardt/go-win64api"
 )
 
-// userseek - пишет пользователей
+// userseek finds all currently logged in users
 func userseek(ch chan<- string) {
 	users, err := wapi.ListLoggedInUsers()
 	if err != nil {
-		fmt.Printf("Ошибка получения списка пользователей: %v\n", err)
+		fmt.Printf("Error capturing logged in users: %v\n", err)
 		return
 	}
-	//dbg
-	fmt.Println("Пользователи в системе:")
+	
+	fmt.Println("Users found:")
 	for _, u := range users {
 		user := u.FullUser()
 		fmt.Printf("\t%s\n", user)

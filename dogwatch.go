@@ -14,26 +14,27 @@ func DogWatch(ch <-chan string) {
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
 	outputDir := "output"
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		fmt.Println("Ошибка создания директории:", err)
+		fmt.Println("Error creating output directory:", err)
 		return
 	}
+	
 	filename := filepath.Join(outputDir, fmt.Sprintf("process_%s.csv", timestamp))
 	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Println("Ошибка создания файла:", err)
+		fmt.Println("Error creating file:", err)
 		return
 	}
-	// хоть ide говорит, что так лучше не делать - я потом с файлом же не работают
 	defer file.Close()
+	
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
-	// титульник csv
+	
 	writer.Write([]string{"PID", "Username", "Executable", "Fullpath", "Uptime"})
 
 	for user := range ch {
 		pr, err := wapi.ProcessList()
 		if err != nil {
-			fmt.Printf("Ошибка получения списка процессов: %v\n", err)
+			fmt.Printf("Error getting process list: %v\n", err)
 			continue
 		}
 		for _, p := range pr {
@@ -56,10 +57,9 @@ func DogWatch(ch <-chan string) {
 				uptimeDur.String(),
 			}
 			if err := writer.Write(record); err != nil {
-				fmt.Println("Ошибка записи в CSV:", err)
+				fmt.Println("Error writing to CSV:", err)
 			}
 		}
 	}
-	//dbg
-	fmt.Println("CSV создан:", filename)
+	fmt.Println("CSV saved to:", filename)
 }
